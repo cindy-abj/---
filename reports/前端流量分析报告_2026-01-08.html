@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>前端流量数据分析报告 | 阿宝姐公司管理</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-gradient: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --accent-blue: #4facfe;
+            --accent-purple: #a855f7;
+            --accent-green: #10b981;
+            --accent-orange: #f59e0b;
+            --accent-red: #ef4444;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: var(--primary-gradient);
+            min-height: 100vh;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding: 40px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+        }
+
+        .header .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .header .date {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 8px 24px;
+            background: rgba(79, 172, 254, 0.1);
+            border: 1px solid rgba(79, 172, 254, 0.3);
+            border-radius: 100px;
+            color: var(--accent-blue);
+            font-size: 0.9rem;
+        }
+
+        /* Section */
+        .section {
+            margin-bottom: 48px;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--card-border);
+        }
+
+        .section-title .icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            border-radius: 12px;
+            font-size: 1.2rem;
+        }
+
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 24px;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .card-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .card-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .trend-up { color: var(--accent-green); }
+        .trend-down { color: var(--accent-red); }
+        .trend-neutral { color: var(--accent-orange); }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-success { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); }
+        .badge-warning { background: rgba(245, 158, 11, 0.15); color: var(--accent-orange); }
+        .badge-danger { background: rgba(239, 68, 68, 0.15); color: var(--accent-red); }
+        .badge-info { background: rgba(79, 172, 254, 0.15); color: var(--accent-blue); }
+
+        /* Data Table */
+        .data-table {
+            width: 100%;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .data-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 16px 20px;
+            text-align: left;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .data-table th {
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .data-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-blue { background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple)); }
+        .progress-green { background: var(--accent-green); }
+        .progress-orange { background: var(--accent-orange); }
+        .progress-red { background: var(--accent-red); }
+
+        /* Insight Box */
+        .insight-box {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-left: 4px solid var(--accent-blue);
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin: 20px 0;
+        }
+
+        .insight-box.warning {
+            border-left-color: var(--accent-orange);
+        }
+
+        .insight-box.danger {
+            border-left-color: var(--accent-red);
+        }
+
+        .insight-box.success {
+            border-left-color: var(--accent-green);
+        }
+
+        .insight-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .insight-content {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* Comparison Table */
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .comparison-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .comparison-card h4 {
+            font-size: 1.1rem;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .comparison-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .comparison-item:last-child {
+            border-bottom: none;
+        }
+
+        .comparison-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .comparison-value {
+            font-weight: 600;
+        }
+
+        /* Funnel Chart */
+        .funnel-container {
+            padding: 24px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+        }
+
+        .funnel-step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .funnel-bar {
+            height: 48px;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            transition: width 0.5s ease;
+        }
+
+        .funnel-label {
+            width: 120px;
+            font-weight: 500;
+            margin-right: 16px;
+        }
+
+        .funnel-value {
+            color: white;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .funnel-rate {
+            margin-left: 16px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Ranking List */
+        .ranking-list {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .ranking-item:last-child {
+            border-bottom: none;
+        }
+
+        .ranking-number {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-weight: 700;
+            margin-right: 16px;
+        }
+
+        .ranking-number.top-1 { background: linear-gradient(135deg, #ffd700, #ffb700); color: #1a1a2e; }
+        .ranking-number.top-2 { background: linear-gradient(135deg, #c0c0c0, #a0a0a0); color: #1a1a2e; }
+        .ranking-number.top-3 { background: linear-gradient(135deg, #cd7f32, #b8860b); color: #1a1a2e; }
+        .ranking-number.normal { background: var(--card-border); color: var(--text-secondary); }
+
+        .ranking-content {
+            flex: 1;
+        }
+
+        .ranking-title {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .ranking-stats {
+            display: flex;
+            gap: 16px;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        /* Recommendation Box */
+        .recommendation-box {
+            background: linear-gradient(135deg, rgba(79, 172, 254, 0.1), rgba(168, 85, 247, 0.1));
+            border: 1px solid rgba(79, 172, 254, 0.2);
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 24px;
+        }
+
+        .recommendation-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .recommendation-list {
+            list-style: none;
+        }
+
+        .recommendation-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--card-border);
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .recommendation-list li:last-child {
+            border-bottom: none;
+        }
+
+        .recommendation-list .bullet {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--accent-blue);
+            border-radius: 50%;
+            font-size: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 16px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card-value {
+                font-size: 1.5rem;
+            }
+
+            .data-table {
+                overflow-x: auto;
+            }
+
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>前端流量数据分析报告</h1>
+            <p class="subtitle">抖音直播 · 视频号 · 小红书 · 素材投放 · 短视频</p>
+            <span class="date">数据周期：2025年11月 - 2026年1月 | 生成时间：2026-01-08</span>
+        </header>
+
+        <!-- 核心指标概览 -->
+        <section class="section">
+            <h2 class="section-title">
+                <span class="icon">📊</span>
+                核心指标概览
+            </h2>
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">抖音直播场均成交</span>
+                        <span class="badge badge-success">主力渠道</span>
+                    </div>
+                    <div class="card-value">¥1,517</div>
+                    <div class="card-subtitle">12场直播 | 总成交 ¥18,210</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill progress-blue" style="width: 75%"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">视频号直播ROI</span>
+                        <span class="badge badge-warning">测试中</span>
+                    </div>
+                    <div class="card-value">1.71</div>
+                    <div class="card-subtitle">2场直播 | 平均消耗 ¥154</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill progress-orange" style="width: 40%"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">小红书留资成本</span>
+                        <span class="badge badge-info">可优化</span>
+                    </div>
+                    <div class="card-value">¥72</div>
+                    <div class="card-subtitle">有效笔记 4条 | 总留资 18人</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill progress-green" style="width: 60%"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">高消耗素材数量</span>
+                        <span class="badge badge-danger">需补充</span>
+                    </div>
+                    <div class="card-value">2条</div>
+                    <div class="card-subtitle">R4+R5级别 | 主力：抖音3-8混剪</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill progress-red" style="width: 20%"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 抖音直播深度分析 -->
+        <section class="section">
+            <h2 class="section-title">
+                <span class="icon">🎬</span>
+                抖音直播深度分析（12场数据）
+            </h2>
+
+            <!-- 基础数据统计 -->
+            <h3 style="font-size: 1.1rem; margin: 24px 0 16px; color: var(--text-secondary);">📈 基础数据统计</h3>
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>指标</th>
+                            <th>平均值</th>
+                            <th>最高值</th>
+                            <th>最低值</th>
+                            <th>标准差</th>
+                            <th>状态</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>直播间成交金额</td>
+                            <td><strong>¥1,517</strong></td>
+                            <td class="trend-up">¥3,583</td>
+                            <td class="trend-down">¥693</td>
+                            <td>¥826</td>
+                            <td><span class="badge badge-success">正常波动</span></td>
+                        </tr>
+                        <tr>
+                            <td>成交人数</td>
+                            <td><strong>152人</strong></td>
+                            <td class="trend-up">361人</td>
+                            <td class="trend-down">69人</td>
+                            <td>89人</td>
+                            <td><span class="badge badge-success">稳定</span></td>
+                        </tr>
+                        <tr>
+                            <td>千次观看成交金额</td>
+                            <td><strong>¥238</strong></td>
+                            <td class="trend-up">¥307</td>
+                            <td class="trend-down">¥115</td>
+                            <td>¥61</td>
+                            <td><span class="badge badge-success">良好</span></td>
+                        </tr>
+                        <tr>
+                            <td>人均观看时长</td>
+                            <td><strong>57秒</strong></td>
+                            <td class="trend-up">1分08秒</td>
+                            <td class="trend-down">51秒</td>
+                            <td>5秒</td>
+                            <td><span class="badge badge-warning">待提升</span></td>
+                        </tr>
+                        <tr>
+                            <td>退款金额占比</td>
+                            <td><strong>3.4%</strong></td>
+                            <td class="trend-down">12.9%</td>
+                            <td class="trend-up">0.8%</td>
+                            <td>3.5%</td>
+                            <td><span class="badge badge-warning">存在异常</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 转化漏斗分析 -->
+            <h3 style="font-size: 1.1rem; margin: 32px 0 16px; color: var(--text-secondary);">🔄 转化漏斗分析</h3>
+            <div class="funnel-container">
+                <div class="funnel-step">
+                    <span class="funnel-label">曝光</span>
+                    <div class="funnel-bar" style="width: 100%;">
+                        <span class="funnel-value">100%</span>
+                    </div>
+                    <span class="funnel-rate">基准</span>
+                </div>
+                <div class="funnel-step">
+                    <span class="funnel-label">观看</span>
+                    <div class="funnel-bar" style="width: 34%; background: linear-gradient(90deg, #60a5fa, #818cf8);">
+                        <span class="funnel-value">3.4%</span>
+                    </div>
+                    <span class="funnel-rate">曝光→观看率（范围：2.5%-5.2%）</span>
+                </div>
+                <div class="funnel-step">
+                    <span class="funnel-label">商品点击</span>
+                    <div class="funnel-bar" style="width: 12%; background: linear-gradient(90deg, #818cf8, #a78bfa);">
+                        <span class="funnel-value">~12%</span>
+                    </div>
+                    <span class="funnel-rate">观看→点击（估算）</span>
+                </div>
+                <div class="funnel-step">
+                    <span class="funnel-label">成交</span>
+                    <div class="funnel-bar" style="width: 4%; background: linear-gradient(90deg, #a78bfa, #c084fc);">
+                        <span class="funnel-value">2.9%</span>
+                    </div>
+                    <span class="funnel-rate">观看→成交率（范围：1.4%-3.8%）</span>
+                </div>
+            </div>
+
+            <div class="insight-box success">
+                <div class="insight-title">✅ 亮点发现</div>
+                <div class="insight-content">
+                    商品点击→成交率高达 <strong>31.9%</strong>（范围25.5%-40.8%），说明进入商品页的用户购买意愿强，转化能力OK。瓶颈在于<strong>前端流量的点击率</strong>。
+                </div>
+            </div>
+
+            <!-- 流量结构分析 -->
+            <h3 style="font-size: 1.1rem; margin: 32px 0 16px; color: var(--text-secondary);">📡 流量结构分析</h3>
+            <div class="comparison-grid">
+                <div class="comparison-card">
+                    <h4>🆓 免费流量（直播推荐）</h4>
+                    <div class="comparison-item">
+                        <span class="comparison-label">平均占比</span>
+                        <span class="comparison-value">26.8%</span>
+                    </div>
+                    <div class="comparison-item">
+                        <span class="comparison-label">最高</span>
+                        <span class="comparison-value trend-up">52.3%</span>
+                    </div>
+                    <div class="comparison-item">
+                        <span class="comparison-label">最低</span>
+                        <span class="comparison-value trend-down">14.4%</span>
+                    </div>
+                    <div class="comparison-item">
+                        <span class="comparison-label">特点</span>
+                        <span class="comparison-value">成本低，转化率略低</span>
+                    </div>
+                </div>
+
+                <div class="comparison-card">
+                    <h4>👥 粉丝流量（关注推荐）</h4>
+                    <div class="comparison-item">
+                        <span class="comparison-label">平均占比</span>
+                        <span class="comparison-value">31.5%</span>
+                    </div>
+                    <div class="comparison-item">
+                        <span class="comparison-label">最高</span>
+                        <span class="comparison-value trend-up">48.1%</span>
+                    </div>
+                    <div class="comparison-item">
+                        <span class="comparison-label">最低</span>
+                        <span class="comparison-value trend-down">15.5%</span>
+                    </div>
+                    <div class="comparison-item">
+                        <span class="comparison-label">特点</span>
+                        <span class="comparison-value">转化率高，规模受限</span>
+                    </div>
+                </div>
+
+                <div class="comparison-card">
+                    <h4>💰 付费流量（千川PC版）</h4>
+                    <div class="comparison-item">
+                        <span class="comparison-label">平均占比</span>
+                        <span class="comparison-value">22.4%</span>
+                    </div>
+                    <div class="comparison-item">
+                        <span class="comparison-label">最高</span>
+                        <span class="comparison-value trend-up">45.4%</span>
+                    </div>
+                    <div class="comparison-item">
+                        <span class="comparison-label">最低</span>
+                        <span class="comparison-value trend-down">2.0%</span>
+                    </div>
+                    <div class="comparison-item">
+                        <span class="comparison-label">特点</span>
+                        <span class="comparison-value">可控放量，需ROI管控</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="insight-box">
+                <div class="insight-title">💡 流量结构洞察</div>
+                <div class="insight-content">
+                    当<strong>付费流量占比>30%</strong>时，成交金额普遍更高（如1/6场付费26%+成交¥3,583）。建议在转化率稳定时适当提升付费占比以扩大规模。
+                </div>
+            </div>
+
+            <!-- 异常值监控 -->
+            <h3 style="font-size: 1.1rem; margin: 32px 0 16px; color: var(--text-secondary);">⚠️ 异常值监控</h3>
+            <div class="insight-box danger">
+                <div class="insight-title">🚨 退款异常预警</div>
+                <div class="insight-content">
+                    <strong>1月20日</strong>场次退款率高达 <strong>12.9%</strong>（平均3.4%的3.8倍），需复盘当日直播话术、产品介绍是否存在过度承诺。
+                </div>
+            </div>
+
+            <div class="insight-box warning">
+                <div class="insight-title">📉 低转化场次</div>
+                <div class="insight-content">
+                    <strong>1月20日</strong>场次观看-成交率仅 <strong>1.4%</strong>（平均2.9%的一半），人均观看54秒低于平均，可能是开播时间较晚（22:22）或内容吸引力不足。
+                </div>
+            </div>
+
+            <!-- 相关性分析 -->
+            <h3 style="font-size: 1.1rem; margin: 32px 0 16px; color: var(--text-secondary);">🔗 关键相关性发现</h3>
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-title">人均观看时长 vs 成交率</div>
+                    <div class="card-value" style="font-size: 1.5rem; color: var(--accent-green);">正相关 ↑</div>
+                    <div class="card-subtitle">观看时长>1分钟的场次，成交率平均提升35%</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">开播时长 vs 成交金额</div>
+                    <div class="card-value" style="font-size: 1.5rem; color: var(--accent-green);">正相关 ↑</div>
+                    <div class="card-subtitle">开播>2小时的场次，成交均值¥1,800+</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">互动率 vs 新增粉丝</div>
+                    <div class="card-value" style="font-size: 1.5rem; color: var(--accent-green);">正相关 ↑</div>
+                    <div class="card-subtitle">互动率>3%时，新增粉丝数翻倍</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">直播推荐占比 vs 成交</div>
+                    <div class="card-value" style="font-size: 1.5rem; color: var(--accent-orange);">弱负相关 ↓</div>
+                    <div class="card-subtitle">免费流量占比高时成交反而略低</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 抖音 vs 视频号对比 -->
+        <section class="section">
+            <h2 class="section-title">
+                <span class="icon">⚖️</span>
+                抖音 vs 视频号 横向对比
+            </h2>
+
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>对比维度</th>
+                            <th>抖音直播</th>
+                            <th>视频号直播</th>
+                            <th>差异分析</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>场均成交金额</td>
+                            <td><strong>¥1,517</strong></td>
+                            <td>¥267</td>
+                            <td><span class="badge badge-info">抖音是视频号的5.7倍</span></td>
+                        </tr>
+                        <tr>
+                            <td>千次观看成交</td>
+                            <td>¥238</td>
+                            <td><strong>¥247</strong></td>
+                            <td><span class="badge badge-success">视频号略高</span></td>
+                        </tr>
+                        <tr>
+                            <td>人均观看时长</td>
+                            <td>57秒</td>
+                            <td><strong>2分57秒</strong></td>
+                            <td><span class="badge badge-success">视频号是抖音的3.1倍</span></td>
+                        </tr>
+                        <tr>
+                            <td>商品点击转化率</td>
+                            <td>31.9%</td>
+                            <td><strong>33.5%</strong></td>
+                            <td><span class="badge badge-success">转化能力相近</span></td>
+                        </tr>
+                        <tr>
+                            <td>场均成交人数</td>
+                            <td><strong>152人</strong></td>
+                            <td>27人</td>
+                            <td><span class="badge badge-warning">视频号流量规模小</span></td>
+                        </tr>
+                        <tr>
+                            <td>投放ROI</td>
+                            <td>-</td>
+                            <td>0.12-2.28</td>
+                            <td><span class="badge badge-warning">视频号仍在测试</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="insight-box success">
+                <div class="insight-title">✅ 核心结论</div>
+                <div class="insight-content">
+                    视频号<strong>用户粘性更强</strong>（观看时长3倍），<strong>转化能力相近</strong>，但<strong>流量规模是瓶颈</strong>。建议视频号聚焦私域导流和主题直播预约，抖音聚焦公域放量。
+                </div>
+            </div>
+
+            <!-- 视频号投放测试 -->
+            <h3 style="font-size: 1.1rem; margin: 32px 0 16px; color: var(--text-secondary);">🧪 视频号投放测试总结</h3>
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>测试参数</th>
+                            <th>设置</th>
+                            <th>ROI结果</th>
+                            <th>结论</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>优先目标：直播间成交</td>
+                            <td>控成本加热 + 500豆目标值</td>
+                            <td class="trend-down">0.12-0.44</td>
+                            <td><span class="badge badge-danger">效果较差</span></td>
+                        </tr>
+                        <tr>
+                            <td>优先目标：成交ROI</td>
+                            <td>控成本加热 + 0.18目标值</td>
+                            <td class="trend-down">0-0.16</td>
+                            <td><span class="badge badge-danger">未达预期</span></td>
+                        </tr>
+                        <tr>
+                            <td>年龄定向</td>
+                            <td>24-50岁</td>
+                            <td>-</td>
+                            <td><span class="badge badge-info">定向合理</span></td>
+                        </tr>
+                        <tr>
+                            <td>粉丝层推荐</td>
+                            <td>选择相似作者的粉丝</td>
+                            <td>-</td>
+                            <td><span class="badge badge-warning">待测试更多对标账号</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="insight-box warning">
+                <div class="insight-title">📋 视频号下一步测试建议</div>
+                <div class="insight-content">
+                    1. 测试<strong>放量加热</strong>模式看是否能拉高曝光<br>
+                    2. 测试<strong>短视频素材加热</strong>而非直播间加热<br>
+                    3. 扩大<strong>对标账号池</strong>，测试不同人群包<br>
+                    4. 提高<strong>单次下单金额</strong>到15000豆以获得更充分的数据
+                </div>
+            </div>
+        </section>
+
+        <!-- 小红书客资分析 -->
+        <section class="section">
+            <h2 class="section-title">
+                <span class="icon">📕</span>
+                小红书客资投放分析
+            </h2>
+
+            <!-- 笔记效果排名 -->
+            <h3 style="font-size: 1.1rem; margin: 24px 0 16px; color: var(--text-secondary);">🏆 笔记效果排名（按留资成本）</h3>
+            <div class="ranking-list">
+                <div class="ranking-item">
+                    <span class="ranking-number top-1">1</span>
+                    <div class="ranking-content">
+                        <div class="ranking-title">面试反复问的就是这六个问题（内附话术）</div>
+                        <div class="ranking-stats">
+                            <span>消费 ¥297</span>
+                            <span>留资 5人</span>
+                            <span class="trend-up">留资成本 ¥59</span>
+                            <span>点击率 5.65%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="ranking-item">
+                    <span class="ranking-number top-2">2</span>
+                    <div class="ranking-content">
+                        <div class="ranking-title">为什么别人3年升经理，你做了5年还是专员？</div>
+                        <div class="ranking-stats">
+                            <span>消费 ¥115</span>
+                            <span>留资 2人</span>
+                            <span class="trend-up">留资成本 ¥58</span>
+                            <span>点击率 2.34%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="ranking-item">
+                    <span class="ranking-number top-3">3</span>
+                    <div class="ranking-content">
+                        <div class="ranking-title">为什么28-32岁跳槽这么难？</div>
+                        <div class="ranking-stats">
+                            <span>消费 ¥395</span>
+                            <span>留资 5人</span>
+                            <span class="trend-neutral">留资成本 ¥79</span>
+                            <span>点击率 2.25%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="ranking-item">
+                    <span class="ranking-number normal">4</span>
+                    <div class="ranking-content">
+                        <div class="ranking-title">投简历总觉得不配？你可能被自己PUA了</div>
+                        <div class="ranking-stats">
+                            <span>消费 ¥551</span>
+                            <span>留资 6人</span>
+                            <span class="trend-down">留资成本 ¥92</span>
+                            <span>点击率 3.52%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 小红书核心指标 -->
+            <h3 style="font-size: 1.1rem; margin: 32px 0 16px; color: var(--text-secondary);">📊 核心指标汇总</h3>
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-title">总消费</div>
+                    <div class="card-value">¥1,358</div>
+                    <div class="card-subtitle">4条有效笔记累计</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">总留资数</div>
+                    <div class="card-value">18人</div>
+                    <div class="card-subtitle">进入私域池</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">平均留资成本</div>
+                    <div class="card-value">¥72</div>
+                    <div class="card-subtitle">范围：¥58-¥92</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">平均点击率</div>
+                    <div class="card-value">3.44%</div>
+                    <div class="card-subtitle">行业中等偏上</div>
+                </div>
+            </div>
+
+            <div class="insight-box success">
+                <div class="insight-title">✅ 高效内容特征</div>
+                <div class="insight-content">
+                    <strong>「面试问题」类</strong>内容表现最佳，因为：<br>
+                    1. 用户痛点明确（即将面试）<br>
+                    2. 承诺价值清晰（话术干货）<br>
+                    3. 行动门槛低（私信领取）<br>
+                    建议后续多产出此类「即时可用干货」型笔记。
+                </div>
+            </div>
+        </section>
+
+        <!-- 素材消耗分析 -->
+        <section class="section">
+            <h2 class="section-title">
+                <span class="icon">🎞️</span>
+                信息流素材消耗分析
+            </h2>
+
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>月份/类型</th>
+                            <th>总视频数</th>
+                            <th>R0 (0-10)</th>
+                            <th>R1 (10-20)</th>
+                            <th>R4 (40-50)</th>
+                            <th>R5 (≥50)</th>
+                            <th>高消耗率</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>11-12月标准</strong></td>
+                            <td>6条</td>
+                            <td>3</td>
+                            <td>1</td>
+                            <td class="trend-up">1</td>
+                            <td class="trend-up">1</td>
+                            <td><span class="badge badge-success">33%</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>12月全域</strong></td>
+                            <td>25条</td>
+                            <td>24</td>
+                            <td>1</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td><span class="badge badge-danger">4%</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="insight-box warning">
+                <div class="insight-title">⚠️ 素材问题诊断</div>
+                <div class="insight-content">
+                    <strong>全域投放素材质量堪忧</strong>：25条素材中24条R0，仅1条R1。<br>
+                    <strong>主力素材</strong>：「抖音3-8混剪」是目前唯一R5级别高消耗素材。<br>
+                    <strong>瓶颈</strong>：缺乏高消耗素材将限制投放规模扩大。
+                </div>
+            </div>
+
+            <div class="recommendation-box">
+                <div class="recommendation-title">💡 素材优化建议</div>
+                <ul class="recommendation-list">
+                    <li>
+                        <span class="bullet">1</span>
+                        <span>分析R5素材「抖音3-8混剪」的<strong>结构、节奏、钩子</strong>，复制成功要素</span>
+                    </li>
+                    <li>
+                        <span class="bullet">2</span>
+                        <span>每周目标产出<strong>2-3条新素材</strong>，保持测试节奏</span>
+                    </li>
+                    <li>
+                        <span class="bullet">3</span>
+                        <span>全域投放需要更多<strong>原生感强</strong>的素材，减少硬广感</span>
+                    </li>
+                    <li>
+                        <span class="bullet">4</span>
+                        <span>建立<strong>素材AB测试</strong>机制，快速淘汰R0素材</span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 主题直播预约分析 -->
+        <section class="section">
+            <h2 class="section-title">
+                <span class="icon">📅</span>
+                主题直播预约分析
+            </h2>
+
+            <!-- 最成功案例 -->
+            <h3 style="font-size: 1.1rem; margin: 24px 0 16px; color: var(--text-secondary);">🎯 最成功案例：「阿宝姐连麦陈言」</h3>
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-title">最终预约人数</div>
+                    <div class="card-value" style="color: var(--accent-green);">595人</div>
+                    <div class="card-subtitle">从41人增长到595人</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">短视频预约占比</div>
+                    <div class="card-value">49%</div>
+                    <div class="card-subtitle">294人来自短视频</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">主页访问占比</div>
+                    <div class="card-value">44%</div>
+                    <div class="card-subtitle">261人来自视频号主页</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">增长周期</div>
+                    <div class="card-value">7天</div>
+                    <div class="card-subtitle">12/9 - 12/16</div>
+                </div>
+            </div>
+
+            <!-- 预约增长曲线 -->
+            <h3 style="font-size: 1.1rem; margin: 32px 0 16px; color: var(--text-secondary);">📈 预约增长关键节点</h3>
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>时间节点</th>
+                            <th>预约人数</th>
+                            <th>新增</th>
+                            <th>关键动作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>12/9 姜学长直播后</td>
+                            <td>41</td>
+                            <td>-</td>
+                            <td>连麦预热</td>
+                        </tr>
+                        <tr>
+                            <td>12/10 视频发布前</td>
+                            <td>48</td>
+                            <td>+7</td>
+                            <td>投流200元</td>
+                        </tr>
+                        <tr>
+                            <td>12/11 视频发布24h</td>
+                            <td>186</td>
+                            <td class="trend-up">+138</td>
+                            <td>视频投流300元</td>
+                        </tr>
+                        <tr>
+                            <td>12/14 视频发布前</td>
+                            <td>291</td>
+                            <td>+105</td>
+                            <td>持续发布</td>
+                        </tr>
+                        <tr>
+                            <td>12/14 直播后</td>
+                            <td>481</td>
+                            <td class="trend-up">+190</td>
+                            <td>直播带来预约</td>
+                        </tr>
+                        <tr>
+                            <td>12/16 直播前</td>
+                            <td>595</td>
+                            <td>+114</td>
+                            <td>朋友圈+社群转发</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="insight-box success">
+                <div class="insight-title">✅ 预约增长秘诀</div>
+                <div class="insight-content">
+                    1. <strong>短视频是核心引擎</strong>：占比49%，每次发布后24h是增长高峰<br>
+                    2. <strong>投流放大效果</strong>：投流100-200元/条可显著提升预约<br>
+                    3. <strong>私域裂变有效</strong>：朋友圈转发+社群推送单日可增100+预约<br>
+                    4. <strong>节奏很重要</strong>：提前7天开始预热，每天保持动作
+                </div>
+            </div>
+        </section>
+
+        <!-- 整体优化建议 -->
+        <section class="section">
+            <h2 class="section-title">
+                <span class="icon">🎯</span>
+                整体优化建议
+            </h2>
+
+            <div class="recommendation-box">
+                <div class="recommendation-title">🔥 优先级最高（本周执行）</div>
+                <ul class="recommendation-list">
+                    <li>
+                        <span class="bullet">1</span>
+                        <span><strong>复盘1/20退款异常</strong>：退款率12.9%，找出原因避免再发生</span>
+                    </li>
+                    <li>
+                        <span class="bullet">2</span>
+                        <span><strong>补充高消耗素材</strong>：仿照「抖音3-8混剪」风格产出2-3条新素材</span>
+                    </li>
+                    <li>
+                        <span class="bullet">3</span>
+                        <span><strong>优化小红书投放</strong>：聚焦「面试话术」类内容，控制留资成本<¥70</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="recommendation-box" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(79, 172, 254, 0.1)); border-color: rgba(16, 185, 129, 0.2);">
+                <div class="recommendation-title">📈 中期优化（本月执行）</div>
+                <ul class="recommendation-list">
+                    <li>
+                        <span class="bullet">1</span>
+                        <span><strong>提升人均观看时长</strong>：目标从57秒提升到70秒，通过优化开场钩子和互动节奏</span>
+                    </li>
+                    <li>
+                        <span class="bullet">2</span>
+                        <span><strong>视频号投放测试</strong>：试验放量加热+短视频素材组合，扩大测试预算到每场500元</span>
+                    </li>
+                    <li>
+                        <span class="bullet">3</span>
+                        <span><strong>建立预约SOP</strong>：固化「7天预热+每日短视频+投流+私域」的预约增长模式</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="recommendation-box" style="background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(236, 72, 153, 0.1)); border-color: rgba(168, 85, 247, 0.2);">
+                <div class="recommendation-title">🚀 长期规划（季度目标）</div>
+                <ul class="recommendation-list">
+                    <li>
+                        <span class="bullet">1</span>
+                        <span><strong>抖音场均成交目标</strong>：从¥1,517提升到¥2,500（+65%）</span>
+                    </li>
+                    <li>
+                        <span class="bullet">2</span>
+                        <span><strong>视频号ROI目标</strong>：稳定在1.5以上后开始放量</span>
+                    </li>
+                    <li>
+                        <span class="bullet">3</span>
+                        <span><strong>小红书月留资目标</strong>：50人/月，成本控制在¥65以内</span>
+                    </li>
+                    <li>
+                        <span class="bullet">4</span>
+                        <span><strong>高消耗素材储备</strong>：保持5条以上R3+级别素材在投</span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>阿宝姐公司管理 · 前端流量数据分析报告</p>
+            <p>Powered by Claude Code | 数据来源：飞书多维表格</p>
+        </footer>
+    </div>
+</body>
+</html>
