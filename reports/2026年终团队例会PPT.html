@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026年阿宝姐团队年终例会</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 0;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .header .subtitle {
+            color: #888;
+            font-size: 1.1em;
+        }
+
+        .nav-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 30px;
+            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            position: sticky;
+            top: 10px;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn {
+            padding: 8px 16px;
+            background: rgba(102, 126, 234, 0.2);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 20px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.85em;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: transparent;
+        }
+
+        .slide {
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
+            min-height: 500px;
+            display: none;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        .slide-number {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            margin-bottom: 20px;
+        }
+
+        .slide h2 {
+            font-size: 2em;
+            margin-bottom: 30px;
+            color: #fff;
+        }
+
+        .slide h3 {
+            font-size: 1.4em;
+            margin: 25px 0 15px 0;
+            color: #667eea;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        th {
+            background: rgba(102, 126, 234, 0.2);
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            border-radius: 0 12px 12px 0;
+            margin: 20px 0;
+        }
+
+        .good { color: #4ade80; }
+        .bad { color: #f87171; }
+        .optimize { color: #fbbf24; }
+
+        .icon {
+            font-size: 1.2em;
+            margin-right: 8px;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        ul li {
+            padding: 10px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        ul li::before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+        }
+
+        .target-card {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px 50px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .target-card .number {
+            font-size: 3em;
+            font-weight: bold;
+        }
+
+        .target-card .label {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2, .grid-3 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 3px;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 25px;
+            padding-left: 20px;
+        }
+
+        .timeline-item::before {
+            content: "";
+            position: absolute;
+            left: -33px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            background: #667eea;
+            border-radius: 50%;
+            border: 3px solid #1a1a2e;
+        }
+
+        .timeline-month {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 1.1em;
+        }
+
+        .warning-box {
+            background: rgba(251, 191, 36, 0.1);
+            border-left: 4px solid #fbbf24;
+            padding: 20px;
+            border-radius: 0 12px 12px 0;
+            margin: 20px 0;
+        }
+
+        .success-box {
+            background: rgba(74, 222, 128, 0.1);
+            border-left: 4px solid #4ade80;
+            padding: 20px;
+            border-radius: 0 12px 12px 0;
+            margin: 20px 0;
+        }
+
+        .team-member {
+            display: inline-block;
+            background: rgba(102, 126, 234, 0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            margin: 5px;
+            font-size: 0.95em;
+        }
+
+        .print-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 15px 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 30px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 1em;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            z-index: 1000;
+        }
+
+        .print-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        @media print {
+            .nav-bar, .print-btn { display: none; }
+            .slide {
+                display: block !important;
+                page-break-after: always;
+                min-height: auto;
+            }
+            body {
+                background: #fff;
+                color: #333;
+            }
+            .slide {
+                background: #fff;
+                border: 1px solid #ddd;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>2026年阿宝姐团队年终例会</h1>
+            <div class="subtitle">2026年1月18日</div>
+        </div>
+
+        <div class="nav-bar">
+            <button class="nav-btn active" onclick="showSlide(0)">1.议程</button>
+            <button class="nav-btn" onclick="showSlide(1)">2.阿宝姐总结</button>
+            <button class="nav-btn" onclick="showSlide(2)">3.年度目标</button>
+            <button class="nav-btn" onclick="showSlide(3)">4.时间轴</button>
+            <button class="nav-btn" onclick="showSlide(4)">5.团队分工</button>
+            <button class="nav-btn" onclick="showSlide(5)">6.组织架构</button>
+            <button class="nav-btn" onclick="showSlide(6)">7.对大家要求</button>
+            <button class="nav-btn" onclick="showSlide(7)">8.优势红利</button>
+            <button class="nav-btn" onclick="showSlide(8)">9.大方向</button>
+            <button class="nav-btn" onclick="showSlide(9)">10.紧急任务</button>
+            <button class="nav-btn" onclick="showSlide(10)">11.Workshop</button>
+            <button class="nav-btn" onclick="showSlide(11)">12.2月目标</button>
+            <button class="nav-btn" onclick="showSlide(12)">13.后续安排</button>
+        </div>
+
+        <!-- Slide 1: Agenda -->
+        <div class="slide active" id="slide-0">
+            <span class="slide-number">第 1 页</span>
+            <h2>会议议程 Agenda</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:150px">时间</th>
+                        <th>内容</th>
+                        <th style="width:120px">时长</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>19:30 - 20:00</strong></td>
+                        <td>线下课快速复盘</td>
+                        <td>30 分钟</td>
+                    </tr>
+                    <tr>
+                        <td><strong>20:00 - 21:00</strong></td>
+                        <td>总结汇报<br>
+                            <small style="color:#888">阿宝姐、惺惺、阿庄、杨杨、阿黎、彤彤、Cindy(optional) 各约7min</small>
+                        </td>
+                        <td>60 分钟</td>
+                    </tr>
+                    <tr>
+                        <td><strong>21:00 - 22:30</strong></td>
+                        <td>
+                            <strong style="color:#667eea">Workshop：AI时代数据资产与流程打通</strong><br>
+                            <small style="color:#888">各部门画图讨论，共同设计数据流程</small>
+                        </td>
+                        <td>90 分钟</td>
+                    </tr>
+                    <tr>
+                        <td><strong>22:30+</strong></td>
+                        <td>AI课与求职课占比讨论<br>
+                            <small style="color:#888">视时间安排</small>
+                        </td>
+                        <td>弹性</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="highlight-box" style="margin-top:30px">
+                <strong>参会人员（7人）</strong><br><br>
+                <span class="team-member">阿宝姐</span>
+                <span class="team-member">惺惺</span>
+                <span class="team-member">阿庄</span>
+                <span class="team-member">杨杨</span>
+                <span class="team-member">阿黎</span>
+                <span class="team-member">彤彤</span>
+                <span class="team-member">Cindy (optional)</span>
+            </div>
+        </div>
+
+        <!-- Slide 2: 333总结 -->
+        <div class="slide" id="slide-1">
+            <span class="slide-number">第 2 页</span>
+            <h2>阿宝姐的 3-3-3 总结</h2>
+
+            <div class="grid-3">
+                <div class="card">
+                    <h3 class="good"><span class="icon">✅</span>3个做得好的</h3>
+                    <ul>
+                        <li><strong>AI转型</strong><br>抓住了这一波AI机会</li>
+                        <li><strong>5980求职课调整</strong><br>转化→交付→管理全链路优化</li>
+                        <li><strong>团队状态</strong><br>分工清晰，整体状态良好</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3 class="bad"><span class="icon">❌</span>3个做得不好的</h3>
+                    <ul>
+                        <li><strong>AI发现太晚</strong><br>本可提前3-6个月发现机会</li>
+                        <li><strong>管理精力不足</strong><br>感谢大家的包容</li>
+                        <li><strong>前后端配合</strong><br>短视频/直播/流量时间配合不够好</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3 class="optimize"><span class="icon">🔄</span>3个继续优化的</h3>
+                    <ul>
+                        <li><strong>AI优化效率</strong><br>结合AI优化前后端管理配合</li>
+                        <li><strong>利润最大化</strong><br>抓住AI机会，同时考虑布局</li>
+                        <li><strong>拓展边界</strong><br>探索产品化、ToB等可能性</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: 年度目标 -->
+        <div class="slide" id="slide-2">
+            <span class="slide-number">第 3 页</span>
+            <h2>2026年度目标</h2>
+
+            <div style="text-align:center">
+                <div class="target-card">
+                    <div class="number">5000万</div>
+                    <div class="label">年度营收目标</div>
+                </div>
+            </div>
+
+            <h3>业务板块拆解</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>序号</th>
+                        <th>业务板块</th>
+                        <th>收入目标</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>①</td>
+                        <td><strong>AI年度会员</strong></td>
+                        <td style="color:#4ade80;font-weight:bold">2000 - 2500万</td>
+                    </tr>
+                    <tr>
+                        <td>②</td>
+                        <td><strong>爆款产品</strong></td>
+                        <td style="color:#4ade80;font-weight:bold">800 - 1500万</td>
+                    </tr>
+                    <tr>
+                        <td>③</td>
+                        <td><strong>ToB</strong></td>
+                        <td style="color:#4ade80;font-weight:bold">300 - 500万</td>
+                    </tr>
+                    <tr>
+                        <td>④</td>
+                        <td><strong>求职课</strong></td>
+                        <td style="color:#4ade80;font-weight:bold">300 - 400万</td>
+                    </tr>
+                    <tr>
+                        <td>⑤</td>
+                        <td><strong>素人矩阵</strong></td>
+                        <td style="color:#4ade80;font-weight:bold">100 - 200万</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Slide 4: 时间轴 -->
+        <div class="slide" id="slide-3">
+            <span class="slide-number">第 4 页</span>
+            <h2>2026年度时间轴</h2>
+
+            <div class="grid-2">
+                <div>
+                    <h3>上半年（1-6月）</h3>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-month">1-2月</div>
+                            <ul>
+                                <li>AI产品内测：目标1000人，实现裂变和付费</li>
+                                <li>AI课低转高链路打通，达到3%转化率</li>
+                                <li>线上交付（课题交付+社群运营）开始正常运转</li>
+                            </ul>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-month">2月</div>
+                            <ul>
+                                <li>产品持续优化</li>
+                                <li>准备答疑机器人分身</li>
+                                <li>积累线上课运营经验、素材、团队能力转移</li>
+                            </ul>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-month">2-3月</div>
+                            <ul>
+                                <li>奇葩说项目</li>
+                                <li>招聘技术完善产品</li>
+                            </ul>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-month">3-4月</div>
+                            <ul>
+                                <li>产品出海</li>
+                                <li>垂直业务板块Agent开发</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-month">4-5月</div>
+                            <ul>
+                                <li>转线上课为主，线下课为辅</li>
+                                <li>利润率最大化</li>
+                            </ul>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-month">4-6月</div>
+                            <ul>
+                                <li>逐渐积累垂直业务板块Agent产品</li>
+                            </ul>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-month">5月</div>
+                            <ul>
+                                <li>素人矩阵：大家一起获客</li>
+                                <li>尝试小的ToB咨询</li>
+                            </ul>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-month">6月</div>
+                            <ul>
+                                <li>职场Hub产品</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3 style="margin-top:30px">下半年（7-12月）</h3>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-month">7-12月</div>
+                            <ul>
+                                <li>品牌化 + 线上为主</li>
+                                <li>冲量/放量（线上模式成熟）</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: 团队分工 -->
+        <div class="slide" id="slide-4">
+            <span class="slide-number">第 5 页</span>
+            <h2>团队分工</h2>
+
+            <div class="grid-2">
+                <div class="card">
+                    <h3 style="color:#667eea;margin-top:0">阿宝姐</h3>
+                    <ul>
+                        <li>直播（每周4-5场）</li>
+                        <li>短视频日更</li>
+                        <li>朋友圈</li>
+                        <li>奇葩说</li>
+                        <li>AI产品MVP（后端交给技术实现）</li>
+                        <li>团队管理</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3 style="color:#667eea;margin-top:0">团队</h3>
+                    <p style="margin-bottom:15px;color:#888">嫁接AI后，各自有更强的管理能力</p>
+                    <ul>
+                        <li>短视频</li>
+                        <li>ToB</li>
+                        <li>求职课</li>
+                        <li>素人矩阵</li>
+                        <li>AI会员线上交付体系和交付</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="highlight-box" style="margin-top:30px">
+                <strong>前端示范：阿宝姐 + 阿庄 的AI配合</strong><br><br>
+                从<strong>内容管理</strong>到<strong>数据投放</strong>的协作配合<br>
+                <small style="color:#888">（Workshop环节展开说明）</small>
+            </div>
+        </div>
+
+        <!-- Slide 6: 组织架构 -->
+        <div class="slide" id="slide-5">
+            <span class="slide-number">第 6 页</span>
+            <h2>团队组织架构</h2>
+
+            <div class="success-box">
+                <h3 style="margin-top:0;color:#4ade80">目前已经是非常棒的组织！</h3>
+                <p>业务、人员、组织架构都已趋于成熟</p>
+            </div>
+
+            <h3>人员分工</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:120px">成员</th>
+                        <th>职责</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>阿宝姐</strong></td>
+                        <td>总控</td>
+                    </tr>
+                    <tr>
+                        <td><strong>惺惺</strong></td>
+                        <td>销售、私域运营、转化、整体管理<br><small style="color:#888">（找不到阿宝姐就找他）</small></td>
+                    </tr>
+                    <tr>
+                        <td><strong>阿庄</strong></td>
+                        <td>内容、前端流量</td>
+                    </tr>
+                    <tr>
+                        <td><strong>杨杨</strong></td>
+                        <td>求职课整体负责<br><small style="color:#888">（逐步把能力往AI课转移，加强AI答疑能力）</small></td>
+                    </tr>
+                    <tr>
+                        <td><strong>阿黎</strong></td>
+                        <td>产品研发项目 + AI交付参与</td>
+                    </tr>
+                    <tr>
+                        <td><strong>彤彤</strong></td>
+                        <td>线下活动 + 直播间添加率 + 直播中控执行</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cindy</strong></td>
+                        <td>财务 <small style="color:#888">(optional)</small></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Slide 7: 对大家的要求 -->
+        <div class="slide" id="slide-6">
+            <span class="slide-number">第 7 页</span>
+            <h2>对大家的要求</h2>
+
+            <div class="warning-box">
+                <h3 style="margin-top:0;color:#fbbf24">所有人都需要更创新！</h3>
+                <ul>
+                    <li>不能只是执行，要<strong>思考和质疑</strong></li>
+                    <li>结合AI后，<strong>很多东西都要修改</strong></li>
+                </ul>
+            </div>
+
+            <h3>举例</h3>
+            <div class="grid-2">
+                <div class="card">
+                    <ul>
+                        <li>直播运营还是老方法？还是结合AI打通新流程？</li>
+                        <li>短视频内容怎么批量起量？</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <ul>
+                        <li>班主任交付怎么结合AI来做？</li>
+                        <li>销售怎么结合AI？整体销售管理怎么结合AI？</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div style="margin-top:30px;padding:20px;background:rgba(248,113,113,0.1);border-radius:12px;text-align:center">
+                <p style="color:#f87171;font-weight:bold;font-size:1.2em">⚠️ 不创新 = 有危险</p>
+            </div>
+        </div>
+
+        <!-- Slide 8: 优势红利 -->
+        <div class="slide" id="slide-7">
+            <span class="slide-number">第 8 页</span>
+            <h2>我们的优势与红利</h2>
+
+            <div class="grid-3">
+                <div class="card" style="text-align:center;padding:30px">
+                    <div style="font-size:3em;margin-bottom:10px">4-6</div>
+                    <div style="color:#4ade80;font-weight:bold">个月红利期</div>
+                    <p style="margin-top:10px;color:#888">跑得更快的窗口</p>
+                </div>
+
+                <div class="card" style="text-align:center;padding:30px">
+                    <div style="font-size:3em;margin-bottom:10px">💰</div>
+                    <div style="color:#4ade80;font-weight:bold">利润红利</div>
+                    <p style="margin-top:10px;color:#888">有资源投入发展</p>
+                </div>
+
+                <div class="card" style="text-align:center;padding:30px">
+                    <div style="font-size:3em;margin-bottom:10px">⏰</div>
+                    <div style="color:#4ade80;font-weight:bold">布局时间红利</div>
+                    <p style="margin-top:10px;color:#888">竞争对手还没跟上</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: 大方向 -->
+        <div class="slide" id="slide-8">
+            <span class="slide-number">第 9 页</span>
+            <h2>2026年大方向</h2>
+
+            <div class="highlight-box">
+                <h3 style="margin-top:0;color:#667eea">核心思路：不能什么都做！</h3>
+                <p>重心要基于实际情况做调整</p>
+            </div>
+
+            <div class="grid-2" style="margin-top:30px">
+                <div class="card" style="border-left:4px solid #667eea">
+                    <h3 style="color:#667eea">AI - 主攻</h3>
+                    <ul>
+                        <li>全团队精力往AI转</li>
+                    </ul>
+                    <p style="margin-top:15px;color:#4ade80;font-weight:bold">这是2026整年的方向</p>
+                </div>
+
+                <div class="card" style="border-left:4px solid #888">
+                    <h3 style="color:#888">求职 - 稳定期</h3>
+                    <ul>
+                        <li>利润率比较低的产品</li>
+                        <li>但要稳住</li>
+                        <li>未来可能还会再起来</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: 1-2月紧急任务 -->
+        <div class="slide" id="slide-9">
+            <span class="slide-number">第 10 页</span>
+            <h2>1-2月紧急任务</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:60px">优先级</th>
+                        <th>任务</th>
+                        <th>说明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span style="background:#ef4444;padding:5px 10px;border-radius:10px">P0</span></td>
+                        <td><strong>交付体系 + CRM打通</strong></td>
+                        <td>线上运营交付体系、课题、积分体系</td>
+                    </tr>
+                    <tr>
+                        <td><span style="background:#f97316;padding:5px 10px;border-radius:10px">P1</span></td>
+                        <td><strong>数据看板搭建</strong></td>
+                        <td>每个部门的记录方式、大看板</td>
+                    </tr>
+                    <tr>
+                        <td><span style="background:#eab308;padding:5px 10px;border-radius:10px">P2</span></td>
+                        <td><strong>AI课与求职课比例</strong></td>
+                        <td>需要讨论并落地</td>
+                    </tr>
+                    <tr>
+                        <td><span style="background:#22c55e;padding:5px 10px;border-radius:10px">P3</span></td>
+                        <td><strong>团队内部AI学习</strong></td>
+                        <td>跟着AI课程快速学习</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Slide 11: Workshop -->
+        <div class="slide" id="slide-10">
+            <span class="slide-number">第 11 页</span>
+            <h2>Workshop：数据资产与流程打通</h2>
+
+            <div class="highlight-box">
+                <h3 style="margin-top:0">这是我们的核心竞争力！</h3>
+            </div>
+
+            <h3>Workshop目标</h3>
+            <div class="grid-2">
+                <div class="card">
+                    <ul>
+                        <li>每个部门的<strong>底层架构核心点</strong></li>
+                        <li><strong>数据沉淀</strong> + 关键信息沉淀</li>
+                        <li>表格之间的<strong>API/接口链接</strong></li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <ul>
+                        <li>哪个表格链接到哪个表格</li>
+                        <li>从哪个表格取数</li>
+                        <li><strong>飞书自动提醒</strong>流程</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>阿宝姐 + 阿庄 示范</h3>
+            <div class="card">
+                <p>从<strong>内容管理</strong>到<strong>数据投放</strong>的协作配合</p>
+                <ul>
+                    <li>阿宝姐怎么搭数据看板</li>
+                    <li>阿庄怎么搭数据看板</li>
+                    <li>两人如何配合</li>
+                </ul>
+            </div>
+
+            <div class="warning-box" style="margin-top:20px">
+                <strong>大家需要先有一个大体的流程和框架！</strong><br>
+                回家后慢慢落地，2月底前完成汇报。
+            </div>
+        </div>
+
+        <!-- Slide 12: 2月底目标 -->
+        <div class="slide" id="slide-11">
+            <span class="slide-number">第 12 页</span>
+            <h2>2月底前必须完成</h2>
+
+            <div class="grid-3">
+                <div class="card" style="text-align:center">
+                    <div style="font-size:2em;color:#4ade80;margin-bottom:10px">✓</div>
+                    <strong>数据线搭完</strong>
+                    <p style="color:#888;margin-top:10px">每个部门的数据记录方式</p>
+                </div>
+                <div class="card" style="text-align:center">
+                    <div style="font-size:2em;color:#4ade80;margin-bottom:10px">✓</div>
+                    <strong>资产管理明确</strong>
+                    <p style="color:#888;margin-top:10px">关键信息沉淀方式</p>
+                </div>
+                <div class="card" style="text-align:center">
+                    <div style="font-size:2em;color:#4ade80;margin-bottom:10px">✓</div>
+                    <strong>部门间打通</strong>
+                    <p style="color:#888;margin-top:10px">数据互相读取</p>
+                </div>
+            </div>
+
+            <div class="highlight-box" style="margin-top:30px">
+                <h3 style="margin-top:0">2月底例会任务</h3>
+                <p>各部门汇报：</p>
+                <ul>
+                    <li>你的部门<strong>数据线</strong>是怎么管的？</li>
+                    <li>你的<strong>资产</strong>怎么管的？</li>
+                    <li>和其他部门<strong>怎么对接</strong>？</li>
+                </ul>
+                <br>
+                <p style="color:#667eea">阿宝姐会从整体中枢角度，帮大家修改调整，让打通更轻松。</p>
+            </div>
+        </div>
+
+        <!-- Slide 13: 后续安排 -->
+        <div class="slide" id="slide-12">
+            <span class="slide-number">第 13 页</span>
+            <h2>后续安排</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>事项</th>
+                        <th>时间</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>1v1 沟通</strong></td>
+                        <td>1月底前</td>
+                    </tr>
+                    <tr>
+                        <td><strong>各部门数据汇报</strong></td>
+                        <td>2月底例会</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="highlight-box" style="margin-top:30px">
+                <h3 style="margin-top:0">1v1沟通内容</h3>
+                <ul>
+                    <li>你的<strong>目标</strong>是什么</li>
+                    <li>你的<strong>职责</strong>是什么</li>
+                    <li><strong>薪酬和绩效</strong>怎么调整</li>
+                </ul>
+            </div>
+
+            <div class="success-box" style="margin-top:20px">
+                <h3 style="margin-top:0;color:#4ade80">大家可以提前思考一下</h3>
+                <p>自己对于目标、职责、薪酬绩效有什么想法，1v1时可以一起讨论。</p>
+            </div>
+
+            <div style="text-align:center;margin-top:40px;padding:30px;background:linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);border-radius:15px">
+                <h2 style="margin-bottom:10px">2026，一起加油！</h2>
+                <p style="color:#888">抓住AI红利期，把数据和流程打通，跑得更快</p>
+            </div>
+        </div>
+
+    </div>
+
+    <button class="print-btn" onclick="window.print()">🖨️ 打印/导出PDF</button>
+
+    <script>
+        function showSlide(index) {
+            // Hide all slides
+            document.querySelectorAll('.slide').forEach(slide => {
+                slide.classList.remove('active');
+            });
+
+            // Remove active from all nav buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected slide
+            document.getElementById('slide-' + index).classList.add('active');
+
+            // Highlight nav button
+            document.querySelectorAll('.nav-btn')[index].classList.add('active');
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            const currentIndex = Array.from(document.querySelectorAll('.slide')).findIndex(s => s.classList.contains('active'));
+
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+                e.preventDefault();
+                if (currentIndex < 12) showSlide(currentIndex + 1);
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (currentIndex > 0) showSlide(currentIndex - 1);
+            }
+        });
+    </script>
+</body>
+</html>

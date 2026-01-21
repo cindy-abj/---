@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026年度项目管理看板 - 阿宝姐公司</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            padding: 30px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .header .subtitle { color: #888; margin-top: 10px; font-size: 1.1em; }
+        .header .target { margin-top: 15px; font-size: 1.8em; color: #ffd700; }
+        .update-info { text-align: right; color: #666; font-size: 0.9em; margin-bottom: 20px; }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.9em; }
+        .legend-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .legend-dot.not-started { background: #666; }
+        .legend-dot.in-progress { background: #ffc107; }
+        .legend-dot.completed { background: #28a745; }
+        .legend-dot.milestone { background: #e91e63; }
+
+        .gantt-container {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 30px;
+            overflow-x: auto;
+        }
+        .gantt-title {
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            padding-left: 10px;
+            border-left: 4px solid #667eea;
+        }
+        .gantt-chart {
+            display: grid;
+            grid-template-columns: 280px repeat(12, 1fr);
+            gap: 2px;
+            min-width: 1200px;
+        }
+        .gantt-header { display: contents; }
+        .gantt-header > div {
+            background: rgba(102, 126, 234, 0.3);
+            padding: 12px 8px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+        .gantt-header .task-col { text-align: left; padding-left: 15px; }
+        .gantt-row { display: contents; }
+        .gantt-row > div {
+            background: rgba(255,255,255,0.03);
+            padding: 10px 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            min-height: 45px;
+            display: flex;
+            align-items: center;
+        }
+        .gantt-row:hover > div { background: rgba(255,255,255,0.08); }
+        .task-name { padding-left: 15px; font-size: 0.9em; }
+        .task-name.sub-task { padding-left: 35px; color: #aaa; font-size: 0.85em; }
+        .task-name .owner { color: #667eea; font-size: 0.8em; margin-left: 8px; }
+        .task-name .dep { color: #e91e63; font-size: 0.75em; margin-left: 5px; }
+
+        .gantt-bar { height: 24px; border-radius: 4px; width: 100%; position: relative; }
+        .gantt-bar.not-started { background: linear-gradient(90deg, #444 0%, #555 100%); }
+        .gantt-bar.in-progress { background: linear-gradient(90deg, #f5af19 0%, #f12711 100%); animation: pulse 2s infinite; }
+        .gantt-bar.completed { background: linear-gradient(90deg, #11998e 0%, #38ef7d 100%); }
+        .gantt-bar.milestone { background: linear-gradient(90deg, #e91e63 0%, #9c27b0 100%); }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+
+        .milestone-section {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .milestone-section h2 {
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            padding-left: 10px;
+            border-left: 4px solid #ffd700;
+        }
+        .milestone-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+        }
+        .milestone-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 15px;
+            border-left: 4px solid #ffd700;
+        }
+        .milestone-card.completed { border-left-color: #28a745; }
+        .milestone-date { font-size: 0.85em; color: #888; }
+        .milestone-title { font-size: 1em; margin: 8px 0; }
+        .milestone-status {
+            font-size: 0.8em;
+            padding: 3px 10px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+        .milestone-status.not-started { background: rgba(102, 102, 102, 0.3); color: #aaa; }
+        .milestone-status.in-progress { background: rgba(255, 193, 7, 0.3); color: #ffc107; }
+        .milestone-status.completed { background: rgba(40, 167, 69, 0.3); color: #28a745; }
+
+        .revenue-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .revenue-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+        .revenue-card .label { font-size: 0.9em; color: #888; margin-bottom: 8px; }
+        .revenue-card .value { font-size: 1.5em; font-weight: bold; color: #667eea; }
+        .revenue-card .percent { font-size: 0.8em; color: #666; margin-top: 5px; }
+
+        .today-focus {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .today-focus h2 { font-size: 1.2em; margin-bottom: 15px; color: #667eea; }
+        .focus-list { list-style: none; }
+        .focus-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .focus-list li:last-child { border-bottom: none; }
+        .priority-tag { font-size: 0.75em; padding: 2px 8px; border-radius: 4px; font-weight: bold; }
+        .priority-tag.p0 { background: #dc3545; }
+        .priority-tag.p1 { background: #fd7e14; }
+        .priority-tag.p2 { background: #ffc107; color: #000; }
+
+        .team-section {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .team-section h2 {
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            padding-left: 10px;
+            border-left: 4px solid #28a745;
+        }
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        .team-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 15px;
+        }
+        .team-card .name { font-weight: bold; color: #667eea; margin-bottom: 8px; }
+        .team-card .role { font-size: 0.85em; color: #aaa; }
+
+        .dependency-section {
+            background: rgba(233, 30, 99, 0.1);
+            border: 1px solid rgba(233, 30, 99, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .dependency-section h2 { color: #e91e63; font-size: 1.2em; margin-bottom: 15px; }
+        .dep-item {
+            background: rgba(0,0,0,0.2);
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+        .dep-arrow { color: #e91e63; margin: 0 10px; }
+
+        @media (max-width: 768px) {
+            .header h1 { font-size: 1.8em; }
+            .gantt-chart { font-size: 0.8em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>2026年度项目管理看板</h1>
+        <div class="subtitle">阿宝姐公司 | CEO视角</div>
+        <div class="target">年度目标：5000万</div>
+    </div>
+
+    <div class="update-info">最后更新：2026-01-21 | 数据源：飞书多维表格</div>
+
+    <!-- 收入目标 -->
+    <div class="revenue-section">
+        <div class="revenue-card">
+            <div class="label">AI年度会员</div>
+            <div class="value">2000-2500万</div>
+            <div class="percent">占比 40-50%</div>
+        </div>
+        <div class="revenue-card">
+            <div class="label">爆款产品</div>
+            <div class="value">800-1500万</div>
+            <div class="percent">占比 16-30%</div>
+        </div>
+        <div class="revenue-card">
+            <div class="label">ToB业务</div>
+            <div class="value">300-500万</div>
+            <div class="percent">占比 6-10%</div>
+        </div>
+        <div class="revenue-card">
+            <div class="label">求职课</div>
+            <div class="value">300-400万</div>
+            <div class="percent">占比 6-8%</div>
+        </div>
+        <div class="revenue-card">
+            <div class="label">素人矩阵</div>
+            <div class="value">100-200万</div>
+            <div class="percent">占比 2-4%</div>
+        </div>
+    </div>
+
+    <!-- 状态图例 -->
+    <div class="legend">
+        <div class="legend-item"><div class="legend-dot not-started"></div><span>未开始</span></div>
+        <div class="legend-item"><div class="legend-dot in-progress"></div><span>进行中</span></div>
+        <div class="legend-item"><div class="legend-dot completed"></div><span>已完成</span></div>
+        <div class="legend-item"><div class="legend-dot milestone"></div><span>里程碑</span></div>
+    </div>
+
+    <!-- 当前聚焦 -->
+    <div class="today-focus">
+        <h2>1-2月紧急任务</h2>
+        <ul class="focus-list">
+            <li><span class="priority-tag p0">P0</span> 2月7-8日第三期线下课（重大改版）</li>
+            <li><span class="priority-tag p0">P0</span> 1月底沟通AI Agent上线</li>
+            <li><span class="priority-tag p0">P0</span> 1月底团队1v1 Review完成</li>
+            <li><span class="priority-tag p1">P1</span> 2月底各部门数据看板+工资调整</li>
+            <li><span class="priority-tag p1">P1</span> 2-3月招聘技术人员</li>
+            <li><span class="priority-tag p2">P2</span> 2月底求职课与AI课拆分</li>
+        </ul>
+    </div>
+
+    <!-- 关键依赖关系 -->
+    <div class="dependency-section">
+        <h2>关键任务依赖链</h2>
+        <div class="dep-item">
+            <strong>AI年度会员：</strong>
+            第三期线下课(2月) <span class="dep-arrow">→</span> 第四期定稿(3月) <span class="dep-arrow">→</span> 4月转线上 <span class="dep-arrow">→</span> 每2-3月一次线下课
+        </div>
+        <div class="dep-item">
+            <strong>爆款产品：</strong>
+            沟通Agent(1月底) <span class="dep-arrow">→</span> 汇报工具(2月) <span class="dep-arrow">→</span> 战略分析(2月底) <span class="dep-arrow">→</span> 职场AI系列(4-5月) <span class="dep-arrow">→</span> AI职场Hub(6月)
+        </div>
+        <div class="dep-item">
+            <strong>ToB业务：</strong>
+            素材储备(3-4月) <span class="dep-arrow">→</span> ToB尝试启动(5-6月) <span class="dep-arrow">→</span> 标杆案例(5-6月) <span class="dep-arrow">→</span> 扩量宣传(6月后)
+        </div>
+        <div class="dep-item">
+            <strong>基础建设：</strong>
+            1v1 Review(1月底) <span class="dep-arrow">→</span> 数据看板+工资(2月底) <span class="dep-arrow">→</span> 看板管理为主(3月起)
+        </div>
+    </div>
+
+    <!-- 团队成员 -->
+    <div class="team-section">
+        <h2>核心团队</h2>
+        <div class="team-grid">
+            <div class="team-card">
+                <div class="name">阿宝姐</div>
+                <div class="role">总控、AI产品MVP、ToB、团队管理</div>
+            </div>
+            <div class="team-card">
+                <div class="name">杏杏</div>
+                <div class="role">销售、私域运营、转化、整体管理（副手）</div>
+            </div>
+            <div class="team-card">
+                <div class="name">阿庄</div>
+                <div class="role">内容、前端流量、素人矩阵</div>
+            </div>
+            <div class="team-card">
+                <div class="name">杨杨</div>
+                <div class="role">求职课整体负责</div>
+            </div>
+            <div class="team-card">
+                <div class="name">阿藜</div>
+                <div class="role">产品研发 + AI交付</div>
+            </div>
+            <div class="team-card">
+                <div class="name">桐桐</div>
+                <div class="role">线下活动 + 直播间添加率</div>
+            </div>
+            <div class="team-card">
+                <div class="name">Cindy</div>
+                <div class="role">财务</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI年度会员甘特图 -->
+    <div class="gantt-container">
+        <h2 class="gantt-title">一、AI年度会员（目标：2000-2500万）</h2>
+        <div class="gantt-chart">
+            <div class="gantt-header">
+                <div class="task-col">任务</div>
+                <div>1月</div><div>2月</div><div>3月</div><div>4月</div><div>5月</div><div>6月</div>
+                <div>7月</div><div>8月</div><div>9月</div><div>10月</div><div>11月</div><div>12月</div>
+            </div>
+            <div class="gantt-row">
+                <div class="task-name"><strong>1.1 线下课节奏</strong></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+            </div>
+            <div class="gantt-row">
+                <div class="task-name sub-task">第三期线下课（重大改版）<span class="owner">@阿宝姐</span></div>
+                <div></div>
+                <div><div class="gantt-bar milestone">2月7-8日</div></div>
+                <div></div><div></div><div></div><div></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+            </div>
+            <div class="gantt-row">
+                <div class="task-name sub-task">第四期线下课（完善定稿）<span class="owner">@阿宝姐</span><span class="dep">依赖:第三期</span></div>
+                <div></div><div></div>
+                <div><div class="gantt-bar milestone">3月初</div></div>
+                <div></div><div></div><div></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+            </div>
+            <div class="gantt-row">
+                <div class="task-name sub-task">4月转线上为主<span class="owner">@阿宝姐+杏杏</span><span class="dep">依赖:第四期</span></div>
+                <div></div><div></div><div></div>
+                <div><div class="gantt-bar milestone">线上7980元</div></div>
+                <div></div><div></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+            </div>
+            <div class="gantt-row">
+                <div class="task-name sub-task">第五期线下课<span class="owner">@阿宝姐</span></div>
+                <div></div><div></div><div></div><div></div>
+                <div><div class="gantt-bar not-started">~45人</div></div>
+                <div></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+            </div>
+            <div class="gantt-row">
+                <div class="task-name sub-task">第六期线下课<span class="owner">@阿宝姐</span></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+                <div><div class="gantt-bar not-started">~45人</div></div>
+                <div></div><div></div><div></div><div></div><div></div>
+            </div>
+            <div class="gantt-row">
+                <div class="task-name sub-task">第七期线下课<span class="owner">@阿宝姐</span></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+                <div></div><div></div>
+                <div><div class="gantt-bar not-started">~45人</div></div>
+                <div></div><div></div><div></div>
+            </div>
+            <div class="gantt-row">
+                <div class="task-name sub-task">第八期线下课<span class="owner">@阿宝姐</span></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+                <div></div><div></div><div></div><div></div>
+                <div><div class="gantt-bar not-started">~45人</div></div>
+                <div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 爆款产品甘特图 -->
+    <div class="gantt-container">
+        <h2 class="gantt-title">二、爆款产品-AI工具（目标：800-1500万）</h2>
+        <div class="gantt-chart">
+            <div class="gantt-header">
+                <div class="task-col">任务</div>
+                <div>1月</div><div>2月</div><div>3月</div><div>4月</div><div>5月</div><div>6月</div>
+                <div>7月</div><div>8月</div><div>9月</div><div>10月</div><div>11月</div><div>12月</div>
+            </div>
+            <div class="gantt-row">
+                <div class="task-name"><strong>2.1 AI工具系列</strong></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+            </div>
+            <div class="gantt-row">
+                <div class="task-name sub-task">沟通AI Agent上线<span class="owner">@阿宝姐</span></div>
+                <div><div class="gantt-bar in-progress">1月底</div></div>
+                <div></div><div></div><div></div><div></div><div></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+            </div>
+            <div class="gantt-row">
+                <div class="task-name sub-task">汇报AI工具上线<span class="owner">@阿宝姐</span><span class="dep">依赖:沟通Agent</span></div>
+                <div></div>
+                <div><div class="gantt-bar milestone">2月</div></div>
+                <div></div><div></div><div></div><div></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+            </div>
+            <div class="gantt-row">
+                <div class="task-name sub-task">战略分析AI工具上线<span class="owner">@阿宝姐</span><span class="dep">依赖:汇报工具</span></div>
+                <div></div>
+                <div><div class="gantt-bar milestone">2月底</div></div>
+                <div></div><div></div><div></div><div></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+            </div>
+            <div class="gantt-row">
+                <div class="task-name sub-task">职场AI工具系列<span class="owner">@阿宝姐</span></div>
+                <div></div><div></div><div></div>
+                <div><div class="gantt-bar not-started"></div></div>
+                <div><div class="gantt-bar not-started">4-5月</div></div>
+                <div></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+            </div>
+            <div class="gantt-row">
+                <div class="task-name sub-task">AI职场Hub上线<span class="owner">@阿宝姐+技术</span><span class="dep">依赖:职场AI系列</span></div>
+                <div></div><div></div><div></div><div></div>
+                <div><div class="gantt-bar not-started"></div></div>
+                <div><div class="gantt-bar milestone">6月前</div></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+            </div>
+            <div class="gantt-row">
+                <div class="task-name sub-task">种子用户积累500-1000人<span class="owner">@阿宝姐</span></div>
+                <div></div><div></div>
+                <div><div class="gantt-bar not-started"></div></div>
+                <div><div class="gantt-bar not-started"></div></div>
+                <div><div class="gantt-bar not-started"></div></div>
+                <div><div class="gantt-bar milestone">目标达成</div></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ToB业务甘特图 -->
+    <div class="gantt-container">
+        <h2 class="gantt-title">三、ToB业务（目标：300-500万）</h2>
+        <div class="gantt-chart">
+            <div class="gantt-header">
+                <div class="task-col">任务</div>
+                <div>1月</div><div>2月</div><div>3月</div><div>4月</div><div>5月</div><div>6月</div>
+                <div>7月</div><div>8月</div><div>9月</div><div>10月</div><div>11月</div><div>12月</div>
+            </div>
+            <div class="gantt-row">
+                <div class="task-name"><strong>3.1 ToB探索</strong></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+            </div>
+            <div class="gantt-row">
+                <div class="task-name sub-task">ToB素材储备<span class="owner">@阿宝姐</span></div>
+                <div></div><div></div>
+                <div><div class="gantt-bar not-started">找场景</div></div>
+                <div><div class="gantt-bar not-started">学生作业+Skills</div></div>
+                <div></div><div></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+            </div>
+            <div class="gantt-row">
+                <div class="task-name sub-task">ToB合作方式确定<span class="owner">@阿宝姐</span></div>
+                <div></div><div></div><div></div>
+                <div><div class="gantt-bar milestone">黄叔/Kevin/带人</div></div>
+                <div></div><div></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+            </div>
+            <div class="gantt-row">
+                <div class="task-name sub-task">ToB尝试启动<span class="owner">@阿宝姐</span><span class="dep">依赖:素材储备</span></div>
+                <div></div><div></div><div></div><div></div>
+                <div><div class="gantt-bar milestone">5月</div></div>
+                <div><div class="gantt-bar milestone">6月</div></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+            </div>
+            <div class="gantt-row">
+                <div class="task-name sub-task">标杆案例打造<span class="owner">@阿宝姐+合作方</span><span class="dep">依赖:ToB启动</span></div>
+                <div></div><div></div><div></div><div></div>
+                <div><div class="gantt-bar not-started"></div></div>
+                <div><div class="gantt-bar milestone">打造标杆</div></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+            </div>
+            <div class="gantt-row">
+                <div class="task-name sub-task">ToB扩量宣传<span class="owner">@待定</span><span class="dep">依赖:标杆案例</span></div>
+                <div></div><div></div><div></div><div></div><div></div>
+                <div><div class="gantt-bar not-started"></div></div>
+                <div><div class="gantt-bar not-started"></div></div>
+                <div><div class="gantt-bar not-started"></div></div>
+                <div><div class="gantt-bar not-started"></div></div>
+                <div><div class="gantt-bar not-started"></div></div>
+                <div><div class="gantt-bar not-started"></div></div>
+                <div><div class="gantt-bar not-started"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 求职课甘特图 -->
+    <div class="gantt-container">
+        <h2 class="gantt-title">四、求职课（目标：300-400万）</h2>
+        <div class="gantt-chart">
+            <div class="gantt-header">
+                <div class="task-col">任务</div>
+                <div>1月</div><div>2月</div><div>3月</div><div>4月</div><div>5月</div><div>6月</div>
+                <div>7月</div><div>8月</div><div>9月</div><div>10月</div><div>11月</div><div>12月</div>
+            </div>
+            <div class="gantt-row">
+                <div class="task-name"><strong>4.1 业务拆分与持续交付</strong></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+            </div>
+            <div class="gantt-row">
+                <div class="task-name sub-task">求职课与AI课拆分<span class="owner">@杨杨</span></div>
+                <div></div>
+                <div><div class="gantt-bar milestone">2月底前</div></div>
+                <div></div><div></div><div></div><div></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+            </div>
+            <div class="gantt-row">
+                <div class="task-name sub-task">人员成本核算<span class="owner">@杨杨+Cindy</span></div>
+                <div></div>
+                <div><div class="gantt-bar not-started">2月底前</div></div>
+                <div></div><div></div><div></div><div></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+            </div>
+            <div class="gantt-row">
+                <div class="task-name sub-task">求职课持续交付<span class="owner">@杨杨</span></div>
+                <div><div class="gantt-bar in-progress"></div></div>
+                <div><div class="gantt-bar in-progress"></div></div>
+                <div><div class="gantt-bar in-progress"></div></div>
+                <div><div class="gantt-bar in-progress"></div></div>
+                <div><div class="gantt-bar in-progress"></div></div>
+                <div><div class="gantt-bar in-progress"></div></div>
+                <div><div class="gantt-bar in-progress"></div></div>
+                <div><div class="gantt-bar in-progress"></div></div>
+                <div><div class="gantt-bar in-progress"></div></div>
+                <div><div class="gantt-bar in-progress"></div></div>
+                <div><div class="gantt-bar in-progress"></div></div>
+                <div><div class="gantt-bar in-progress">全年</div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 素人矩阵甘特图 -->
+    <div class="gantt-container">
+        <h2 class="gantt-title">五、素人矩阵（目标：100-200万）</h2>
+        <div class="gantt-chart">
+            <div class="gantt-header">
+                <div class="task-col">任务</div>
+                <div>1月</div><div>2月</div><div>3月</div><div>4月</div><div>5月</div><div>6月</div>
+                <div>7月</div><div>8月</div><div>9月</div><div>10月</div><div>11月</div><div>12月</div>
+            </div>
+            <div class="gantt-row">
+                <div class="task-name"><strong>5.1 素人孵化</strong></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+            </div>
+            <div class="gantt-row">
+                <div class="task-name sub-task">素人孵化启动<span class="owner">@阿庄</span></div>
+                <div></div><div></div><div></div><div></div><div></div>
+                <div><div class="gantt-bar milestone">6月启动</div></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+            </div>
+            <div class="gantt-row">
+                <div class="task-name sub-task">规模化运营<span class="owner">@阿庄</span></div>
+                <div></div><div></div><div></div><div></div><div></div>
+                <div><div class="gantt-bar not-started"></div></div>
+                <div><div class="gantt-bar not-started"></div></div>
+                <div><div class="gantt-bar not-started"></div></div>
+                <div><div class="gantt-bar not-started"></div></div>
+                <div><div class="gantt-bar not-started"></div></div>
+                <div><div class="gantt-bar not-started"></div></div>
+                <div><div class="gantt-bar not-started">下半年</div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 基础建设甘特图 -->
+    <div class="gantt-container">
+        <h2 class="gantt-title">六、基础建设</h2>
+        <div class="gantt-chart">
+            <div class="gantt-header">
+                <div class="task-col">任务</div>
+                <div>1月</div><div>2月</div><div>3月</div><div>4月</div><div>5月</div><div>6月</div>
+                <div>7月</div><div>8月</div><div>9月</div><div>10月</div><div>11月</div><div>12月</div>
+            </div>
+            <div class="gantt-row">
+                <div class="task-name"><strong>6.1 团队管理</strong></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+            </div>
+            <div class="gantt-row">
+                <div class="task-name sub-task">团队1v1 Review<span class="owner">@阿宝姐</span></div>
+                <div><div class="gantt-bar in-progress">1月底完成</div></div>
+                <div></div><div></div><div></div><div></div><div></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+            </div>
+            <div class="gantt-row">
+                <div class="task-name sub-task">各部门数据看板+工资调整<span class="owner">@阿宝姐</span><span class="dep">依赖:1v1</span></div>
+                <div></div>
+                <div><div class="gantt-bar milestone">2月底前</div></div>
+                <div></div><div></div><div></div><div></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+            </div>
+            <div class="gantt-row">
+                <div class="task-name sub-task">看板管理为主<span class="owner">@阿宝姐</span></div>
+                <div></div><div></div>
+                <div><div class="gantt-bar not-started">3月起</div></div>
+                <div><div class="gantt-bar not-started"></div></div>
+                <div><div class="gantt-bar not-started"></div></div>
+                <div><div class="gantt-bar not-started"></div></div>
+                <div><div class="gantt-bar not-started"></div></div>
+                <div><div class="gantt-bar not-started"></div></div>
+                <div><div class="gantt-bar not-started"></div></div>
+                <div><div class="gantt-bar not-started"></div></div>
+                <div><div class="gantt-bar not-started"></div></div>
+                <div><div class="gantt-bar not-started">管理变轻松</div></div>
+            </div>
+            <div class="gantt-row">
+                <div class="task-name sub-task">每月Leader沟通<span class="owner">@阿宝姐+杏杏</span></div>
+                <div></div><div></div>
+                <div><div class="gantt-bar not-started"></div></div>
+                <div><div class="gantt-bar not-started"></div></div>
+                <div><div class="gantt-bar not-started"></div></div>
+                <div><div class="gantt-bar not-started"></div></div>
+                <div><div class="gantt-bar not-started"></div></div>
+                <div><div class="gantt-bar not-started"></div></div>
+                <div><div class="gantt-bar not-started"></div></div>
+                <div><div class="gantt-bar not-started"></div></div>
+                <div><div class="gantt-bar not-started"></div></div>
+                <div><div class="gantt-bar not-started">每月</div></div>
+            </div>
+            <div class="gantt-row">
+                <div class="task-name"><strong>6.2 导师管理</strong></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+            </div>
+            <div class="gantt-row">
+                <div class="task-name sub-task">刘西平老师定位讨论<span class="owner">@阿宝姐</span></div>
+                <div></div>
+                <div><div class="gantt-bar not-started">2月初评估</div></div>
+                <div></div><div></div><div></div><div></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+            </div>
+            <div class="gantt-row">
+                <div class="task-name sub-task">刘西平老师定位决策<span class="owner">@阿宝姐</span><span class="dep">~1.65万/场，全年~10万</span></div>
+                <div></div><div></div>
+                <div><div class="gantt-bar milestone">3月初定论</div></div>
+                <div></div><div></div><div></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+            </div>
+            <div class="gantt-row">
+                <div class="task-name sub-task">凯文老师参与线上课设计<span class="owner">@阿宝姐</span><span class="dep">5%利润~50-60万/年</span></div>
+                <div></div><div></div>
+                <div><div class="gantt-bar not-started"></div></div>
+                <div><div class="gantt-bar not-started">深度参与</div></div>
+                <div></div><div></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+            </div>
+            <div class="gantt-row">
+                <div class="task-name sub-task">凯文老师参与ToB业务<span class="owner">@阿宝姐</span></div>
+                <div></div><div></div><div></div><div></div>
+                <div><div class="gantt-bar not-started"></div></div>
+                <div><div class="gantt-bar not-started">重点参与</div></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 人员招聘甘特图 -->
+    <div class="gantt-container">
+        <h2 class="gantt-title">七、人员招聘</h2>
+        <div class="gantt-chart">
+            <div class="gantt-header">
+                <div class="task-col">任务</div>
+                <div>1月</div><div>2月</div><div>3月</div><div>4月</div><div>5月</div><div>6月</div>
+                <div>7月</div><div>8月</div><div>9月</div><div>10月</div><div>11月</div><div>12月</div>
+            </div>
+            <div class="gantt-row">
+                <div class="task-name"><strong>7.1 关键岗位</strong></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+            </div>
+            <div class="gantt-row">
+                <div class="task-name sub-task">招聘技术人员<span class="owner">@阿宝姐</span></div>
+                <div></div>
+                <div><div class="gantt-bar milestone">2月</div></div>
+                <div><div class="gantt-bar milestone">3月 ~2万/月</div></div>
+                <div></div><div></div><div></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+            </div>
+            <div class="gantt-row">
+                <div class="task-name sub-task">各板块人员补充<span class="owner">@阿宝姐</span></div>
+                <div></div><div></div><div></div><div></div>
+                <div><div class="gantt-bar not-started"></div></div>
+                <div><div class="gantt-bar milestone">7月前到位</div></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 关键里程碑 -->
+    <div class="milestone-section">
+        <h2>关键里程碑</h2>
+        <div class="milestone-grid">
+            <div class="milestone-card">
+                <div class="milestone-date">1月底</div>
+                <div class="milestone-title">沟通AI Agent上线</div>
+                <span class="milestone-status in-progress">进行中</span>
+            </div>
+            <div class="milestone-card">
+                <div class="milestone-date">1月底</div>
+                <div class="milestone-title">团队1v1 Review完成</div>
+                <span class="milestone-status in-progress">进行中</span>
+            </div>
+            <div class="milestone-card">
+                <div class="milestone-date">2月7-8日</div>
+                <div class="milestone-title">第三期线下课（重大改版）</div>
+                <span class="milestone-status not-started">未开始</span>
+            </div>
+            <div class="milestone-card">
+                <div class="milestone-date">2月底</div>
+                <div class="milestone-title">战略分析AI工具上线</div>
+                <span class="milestone-status not-started">未开始</span>
+            </div>
+            <div class="milestone-card">
+                <div class="milestone-date">2月底</div>
+                <div class="milestone-title">各部门数据看板+工资调整</div>
+                <span class="milestone-status not-started">未开始</span>
+            </div>
+            <div class="milestone-card">
+                <div class="milestone-date">3月初</div>
+                <div class="milestone-title">第四期线下课（完善定稿）</div>
+                <span class="milestone-status not-started">未开始</span>
+            </div>
+            <div class="milestone-card">
+                <div class="milestone-date">4月</div>
+                <div class="milestone-title">转线上课为主</div>
+                <span class="milestone-status not-started">未开始</span>
+            </div>
+            <div class="milestone-card">
+                <div class="milestone-date">5月</div>
+                <div class="milestone-title">ToB业务尝试启动</div>
+                <span class="milestone-status not-started">未开始</span>
+            </div>
+            <div class="milestone-card">
+                <div class="milestone-date">6月</div>
+                <div class="milestone-title">AI职场Hub上线</div>
+                <span class="milestone-status not-started">未开始</span>
+            </div>
+            <div class="milestone-card">
+                <div class="milestone-date">6月</div>
+                <div class="milestone-title">素人孵化启动</div>
+                <span class="milestone-status not-started">未开始</span>
+            </div>
+            <div class="milestone-card">
+                <div class="milestone-date">7月</div>
+                <div class="milestone-title">各板块人员补充到位</div>
+                <span class="milestone-status not-started">未开始</span>
+            </div>
+            <div class="milestone-card">
+                <div class="milestone-date">7月起</div>
+                <div class="milestone-title">下半年扩量放量</div>
+                <span class="milestone-status not-started">未开始</span>
+            </div>
+        </div>
+    </div>
+
+    <div style="text-align: center; color: #666; padding: 30px 0; font-size: 0.9em;">
+        由 Claude 维护 | 飞书数据源：<a href="https://k8ncicd9x7.feishu.cn/base/PlERbFXtoaX8VNsYUIHcAx58nih" style="color: #667eea;">2026年度项目管理</a><br>
+        有变更请告知，我会同步更新飞书表格和本看板
+    </div>
+</body>
+</html>
