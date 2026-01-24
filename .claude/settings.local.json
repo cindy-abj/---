@@ -22,7 +22,8 @@
       "mcp__lark-mcp__bitable_v1_appTable_create",
       "mcp__lark-mcp__contact_v3_user_batchGetId",
       "mcp__lark-mcp__drive_v1_permissionMember_create",
-      "mcp__lark-mcp__im_v1_message_create"
+      "mcp__lark-mcp__im_v1_message_create",
+      "mcp__lark-mcp__docx_builtin_import"
     ]
   }
 }
